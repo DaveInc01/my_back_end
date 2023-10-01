@@ -7,7 +7,6 @@ const animalRoutes = getAnimalsRoutes(app)
 app.use('/animals', animalRoutes)
 
 
-
 app.listen(PORT, ()=>{
     console.log("server is up to date")
 })

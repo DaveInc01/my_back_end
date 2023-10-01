@@ -23,7 +23,7 @@ export const getAnimalsRoutes = (app: Express) => {
 //     res.end()
 // })
 
-router.get('/', animalsMiddleware, (req: Request, res: Response<ViewAnimalModel[]>) =>{
+router.get('/', (req: Request, res: Response<ViewAnimalModel[]>) =>{
     res.json(db.animals.map(animal =>{
         return{
             id: animal.id,
@@ -57,7 +57,7 @@ router.get('/:id', (req: reqWithParam<GetAnimalParamModel>, res: Response<ViewAn
 })
 
 router.post('/', (req : reqWithBody<CreateAnimalModel>, res: Response<ViewAnimalModel>)=>{
-    // console.log(req.body)
+    console.log(req.body)
     const newAnimal : animalType = {
         id : db.animals.length + 1,
         name: req.body.name,
