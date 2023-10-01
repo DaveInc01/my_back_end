@@ -5,15 +5,25 @@ import { GetAnimalParamModel } from '../models/GetAnimalParamModel'
 import { QueryAnimalModel } from '../models/QueryAnimalModel'
 import { ViewAnimalModel } from '../models/ViewAnimalModel'
 import { db, animalType } from "../app"
+import express, { NextFunction } from 'express'
 
-export const addAnimalsRoutes = (app: Express) => {
 
-app.get('/', (req, res)=>{
-    res.send("Home page")
-    res.end()
-})
+const animalsMiddleware = (req :Request, res: Response, next: NextFunction) => {
+    if (req.query.role === "bear")
+        next()
+    else
+        res.sendStatus(401)
+}
 
-app.get('/animal', (req: Request, res: Response<ViewAnimalModel[]>) =>{
+export const getAnimalsRoutes = (app: Express) => {
+
+    const router = express.Router()
+// app.get('/', (req, res)=>{
+//     res.send("Home page")
+//     res.end()
+// })
+
+router.get('/', animalsMiddleware, (req: Request, res: Response<ViewAnimalModel[]>) =>{
     res.json(db.animals.map(animal =>{
         return{
             id: animal.id,
@@ -22,7 +32,7 @@ app.get('/animal', (req: Request, res: Response<ViewAnimalModel[]>) =>{
     }))
 })
 
-app.get('/animals', (req: reqWithQuery<QueryAnimalModel>, res:Response<ViewAnimalModel>)=>{
+router.get('/', (req: reqWithQuery<QueryAnimalModel>, res:Response<ViewAnimalModel>)=>{
         const animalExist = db.animals.find(elem => elem.name === req.query.name)
         if (animalExist){
             res.json({
@@ -34,7 +44,7 @@ app.get('/animals', (req: reqWithQuery<QueryAnimalModel>, res:Response<ViewAnima
         }
 })
 
-app.get('/animals/:id', (req: reqWithParam<GetAnimalParamModel>, res: Response<ViewAnimalModel>)=>{
+router.get('/:id', (req: reqWithParam<GetAnimalParamModel>, res: Response<ViewAnimalModel>)=>{
     const found = db.animals.find(elem => elem.id === +req.params.id)
     if (found){
         res.json({
@@ -46,7 +56,7 @@ app.get('/animals/:id', (req: reqWithParam<GetAnimalParamModel>, res: Response<V
      }
 })
 
-app.post('/animals', (req : reqWithBody<CreateAnimalModel>, res: Response<ViewAnimalModel>)=>{
+router.post('/', (req : reqWithBody<CreateAnimalModel>, res: Response<ViewAnimalModel>)=>{
     // console.log(req.body)
     const newAnimal : animalType = {
         id : db.animals.length + 1,
@@ -59,4 +69,5 @@ app.post('/animals', (req : reqWithBody<CreateAnimalModel>, res: Response<ViewAn
         name: newAnimal.name
     })
 })
+return router
 }
